@@ -1,0 +1,562 @@
+/* ==========================================
+   CSS CHO TRANG DASHBOARD (TỔNG QUAN)
+   ========================================== */
+.dashboard-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    border-radius: 16px;
+    padding: 30px 40px;
+    color: #fff;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.dashboard-header p {
+    font-size: 15px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.dashboard-header-icon {
+    font-size: 60px;
+    opacity: 0.2;
+}
+
+/* Thẻ thống kê (Stat Cards) */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.stat-icon.primary {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.stat-icon.warning {
+    background: #fffbeb;
+    color: #f59e0b;
+}
+
+.stat-icon.success {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.stat-info h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.stat-info p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 5px 0 0 0;
+    font-weight: 500;
+}
+
+/* Khu vực nội dung bên dưới (Grid 2 cột) */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.dash-panel {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    padding: 25px;
+}
+
+.dash-panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dash-panel-title i {
+    color: #3b82f6;
+}
+
+/* Thông báo / Lời khuyên */
+.tip-item {
+    display: flex;
+    gap: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.tip-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.tip-icon {
+    color: #f59e0b;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.tip-text h4 {
+    font-size: 14px;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+}
+
+.tip-text p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   CSS CHO TRANG LỊCH SỬ HỌC THUẬT (HISTORY)
+   ========================================== */
+.history-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden; /* Để bo góc bảng */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.history-table th {
+    background-color: #f8fafc;
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.history-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table tr:hover {
+    background-color: #fbfcfe;
+}
+
+/* Topic & Lecturer Info */
+.topic-info b {
+    display: block;
+    margin-bottom: 4px;
+    color: #0f172a;
+}
+
+.topic-info span {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.status-completed {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.status-cancelled {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* Linked Records (CORE-07) */
+.linked-records {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.record-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.record-item.eval {
+    color: #8b5cf6;
+}
+
+/* Màu tím cho đánh giá */
+.record-item.equip {
+    color: #0ea5e9;
+}
+
+/* Màu xanh cho thiết bị */
+.record-item.none {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Action Buttons */
+.btn-cancel {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.btn-view {
+    background: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Overlay nền đen mờ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+/* Khung Modal */
+.modal-box {
+    background: #fff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 550px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close:hover {
+    color: #ef4444;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* Lưới thông tin chi tiết */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.detail-value {
+    font-size: 15px;
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.detail-value.highlight {
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+.modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+    background: #f8fafc;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* ==========================================
+   CSS CHO BẢNG HOẠT ĐỘNG GẦN ĐÂY (DASHBOARD)
+   ========================================== */
+
+/* 1. Tiêu đề của khối */
+.dash-panel {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    padding: 25px;
+}
+
+.dash-panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dash-panel-title i {
+    color: #3b82f6; /* Màu xanh cho icon tia sét */
+}
+
+/* 2. Định dạng Bảng (Table) */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.custom-table th {
+    background: #f8fafc; /* Nền xám nhạt cho tiêu đề cột */
+    padding: 12px 15px;
+    text-align: left;
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: middle;
+}
+
+/* Xóa dòng kẻ dưới ở hàng cuối cùng */
+.custom-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hiệu ứng hover khi di chuột qua hàng */
+.custom-table tr:hover {
+    background-color: #fbfcfe;
+}
+
+/* 3. Định dạng Thẻ trạng thái (Badge) */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    text-align: center;
+}
+
+.badge-pending {
+    background: #fff7ed; /* Nền cam nhạt */
+    color: #c2410c; /* Chữ cam đậm */
+}
+
+.badge-completed {
+    background: #f0fdf4; /* Nền xanh lá nhạt */
+    color: #15803d; /* Chữ xanh lá đậm */
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+/* Nút Duyệt (btn-edit) - Tone Xanh ngọc / Xanh lá */
+.btn-edit {
+    background-color: #e6fced;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.btn-edit:hover {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Nút Từ chối (btn-delete) - Tone Đỏ / Hồng */
+.btn-delete {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+    transform: translateY(-2px);
+}

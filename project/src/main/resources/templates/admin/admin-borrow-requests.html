@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Duyệt Mượn Thiết Bị</title></head>
+<body>
+<div th:fragment="content">
+
+    <div class="admin-page-header">
+        <div>
+            <h1 class="admin-page-title">Quản Lý Cấp Phát Thiết Bị</h1>
+            <p class="admin-page-subtitle">Theo dõi và xử lý các yêu cầu mượn trả thiết bị phòng Lab</p>
+        </div>
+        <div class="header-stats-mini">
+            <div class="mini-stat">
+                <span class="mini-stat-num pending-color" th:text="${pendingCount}">0</span>
+                <span class="mini-stat-label">Chờ duyệt</span>
+            </div>
+            <div class="mini-stat" style="margin-left: 20px;">
+                <span class="mini-stat-num" style="color: #b45309;" th:text="${borrowingCount}">0</span>
+                <span class="mini-stat-label">Đang mượn</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn tab-btn-active" onclick="filterTab(this, 'PENDING')">
+            Chờ cấp phát
+            <span class="tab-count tab-count-pending" th:text="${pendingCount}">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterTab(this, 'BORROWING')">
+            Đang mượn
+            <span class="tab-count" style="background: #fef3c7; color: #b45309;" th:text="${borrowingCount}">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterTab(this, 'RETURNED')">
+            Đã thu hồi
+            <span class="tab-count" style="background: #f0fdf4; color: #15803d;" th:text="${returnedCount}">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterTab(this, 'ALL')">
+            Tất cả
+        </button>
+    </div>
+
+    <div class="borrow-cards-grid" id="borrow-list">
+
+        <div id="empty-msg" style="text-align: center; padding: 40px; color: #64748b; grid-column: 1 / -1; display: none;">
+            <i class="fa-solid fa-box-open" style="font-size: 40px; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+            Hiện tại không có phiếu mượn nào trong danh mục này.
+        </div>
+
+        <th:block th:if="${allRecords != null and !allRecords.isEmpty()}">
+            <div th:each="record : ${allRecords}" class="borrow-request-card" th:data-status="${record.status}">
+                <div class="brc-header">
+                    <div>
+                        <span class="brc-id" th:text="${'#BR-' + record.id}">#BR-0000</span>
+
+                        <span th:if="${record.status == 'PENDING'}" class="badge badge-pending" style="margin-left:8px;">Chờ cấp phát</span>
+                        <span th:if="${record.status == 'BORROWING'}" class="badge" style="margin-left:8px; background:#fef3c7; color:#b45309;">Đang mượn</span>
+                        <span th:if="${record.status == 'RETURNED'}" class="badge badge-completed" style="margin-left:8px;">Đã trả (Thu hồi)</span>
+                        <span th:if="${record.status == 'REJECTED'}" class="badge" style="margin-left:8px; background:#fee2e2; color:#dc2626;">Bị từ chối</span>
+                    </div>
+                </div>
+                <div class="brc-body">
+                    <div class="brc-info-row">
+                        <div class="brc-info-item">
+                            <span class="brc-info-label">Người mượn</span>
+                            <span class="brc-info-val">Hệ thống & Sinh viên</span>
+                        </div>
+                        <div class="brc-info-item">
+                            <span class="brc-info-label">Mục đích</span>
+                            <span class="brc-info-val" th:text="${record.session != null ? record.session.topic : 'Mượn thiết bị học tập'}">Đồ án</span>
+                        </div>
+                    </div>
+
+                    <div class="brc-equipment-list">
+                        <div th:each="detail : ${record.borrowingDetails}" class="brc-equipment-item">
+                            <span class="brc-equip-icon" th:text="${detail.equipment.category == 'DOCUMENT' ? '📚' : '🔌'}">🔌</span>
+                            <span class="brc-equip-name" th:text="${detail.equipment.name}">Tên thiết bị</span>
+                            <span class="brc-equip-qty" th:text="${'× ' + detail.quantity}">× 1</span>
+
+                            <th:block th:if="${record.status == 'PENDING'}">
+                                <span th:if="${detail.equipment.availableQuantity >= detail.quantity}" class="brc-stock-check stock-ok" th:text="${'✓ Còn ' + detail.equipment.availableQuantity}">✓ Còn 10</span>
+                                <span th:if="${detail.equipment.availableQuantity < detail.quantity}" class="brc-stock-check stock-err" th:text="${'✗ Thiếu hàng (Chỉ còn ' + detail.equipment.availableQuantity + ')'}">✗ Thiếu hàng</span>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brc-footer" style="justify-content: flex-end; gap: 10px;">
+
+                    <th:block th:if="${record.status == 'PENDING'}">
+                        <a th:href="@{/admin/borrow-requests/reject/{id}(id=${record.id})}"
+                           class="btn-secondary" style="color: #ef4444; border-color: #ef4444; text-decoration: none;"
+                           onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Bạn có chắc chắn muốn TỪ CHỐI phiếu mượn này không?', 'Xác nhận từ chối', () => window.location.href = url);">
+                            ✕ Từ chối
+                        </a>
+                        <a th:href="@{/admin/borrow-requests/approve/{id}(id=${record.id})}"
+                           class="btn-primary" style="text-decoration: none;"
+                           onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Xác nhận XUẤT KHO cho phiếu mượn này? Số lượng thiết bị sẽ bị trừ khỏi kho.', 'Xác nhận cấp phát', () => window.location.href = url);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Cho mượn
+                        </a>
+                    </th:block>
+
+                    <th:block th:if="${record.status == 'BORROWING'}">
+                        <a th:href="@{/admin/borrow-requests/return/{id}(id=${record.id})}"
+                           class="btn-primary" style="background-color: #10b981; border-color: #10b981; text-decoration: none;"
+                           onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Xác nhận sinh viên đã trả thiết bị? Số lượng sẽ được tự động cộng lại vào kho.', 'Xác nhận thu hồi', () => window.location.href = url);">
+                            <i class="fa-solid fa-box-archive" style="margin-right: 5px;"></i> Xác nhận thu hồi
+                        </a>
+                    </th:block>
+
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        // Hiện thông báo Alert của hệ thống
+        document.addEventListener("DOMContentLoaded", function () {
+            var successMsg = /*[[${success}]]*/ null;
+            var errorMsg = /*[[${error}]]*/ null;
+
+            if (successMsg && typeof showSuccessAlert === "function") showSuccessAlert(successMsg);
+            if (errorMsg && typeof showErrorAlert === "function") showErrorAlert(errorMsg);
+
+            // Mặc định load trang thì nhảy vào Tab PENDING
+            const pendingTabBtn = document.querySelector('.tab-btn.tab-btn-active');
+            if(pendingTabBtn) {
+                filterTab(pendingTabBtn, 'PENDING');
+            }
+        });
+
+        // Hàm lọc danh sách hiển thị
+        function filterTab(btn, status) {
+            // 1. Chỉnh màu sắc cho nút Tab được chọn
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn-active'));
+            btn.classList.add('tab-btn-active');
+
+            // 2. Lọc các thẻ (cards)
+            const cards = document.querySelectorAll('.borrow-request-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                if (status === 'ALL' || card.getAttribute('data-status') === status) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // 3. Hiện thông báo nếu danh sách trống
+            const emptyMsg = document.getElementById('empty-msg');
+            if (emptyMsg) {
+                emptyMsg.style.display = (visibleCount === 0) ? 'block' : 'none';
+            }
+        }
+        /*]]>*/
+    </script>
+</div>
+</body>
+</html>

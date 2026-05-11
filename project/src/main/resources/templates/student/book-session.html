@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đặt lịch cố vấn học thuật</title>
+</head>
+<body>
+
+<div th:fragment="content">
+    <div class="admin-page-header">
+        <div>
+            <h1 class="admin-page-title">Đặt lịch cố vấn</h1>
+            <p class="admin-page-subtitle">Chọn giảng viên và khung giờ phù hợp để nhận hỗ trợ học thuật</p>
+        </div>
+    </div>
+
+    <div class="booking-container">
+        <div class="booking-card">
+            <form th:action="@{/student/mentoring/book}" th:object="${bookingDto}" method="post" id="bookingForm">
+
+                <div class="form-group">
+                    <label class="form-label">Khoa / Ngành đào tạo *</label>
+                    <select class="form-input" id="departmentSelect" onchange="filterLecturers()">
+                        <option value="">-- Chọn Khoa --</option>
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.id}"
+                                th:text="${dept.name}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Giảng viên hướng dẫn *</label>
+                    <select th:field="*{lecturerId}" class="form-input" id="lecturerSelect" required>
+                        <option value="">-- Vui lòng chọn khoa trước --</option>
+                    </select>
+                    <div class="form-error" th:if="${#fields.hasErrors('lecturerId')}" th:errors="*{lecturerId}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Thời gian bắt đầu *</label>
+                        <input type="datetime-local" th:field="*{startTime}" class="form-input" required/>
+                        <div class="form-error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Thời gian kết thúc *</label>
+                        <input type="datetime-local" th:field="*{endTime}" class="form-input" required/>
+                        <div class="form-error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Chủ đề / Nội dung cần tư vấn *</label>
+                    <textarea th:field="*{topic}" id="topic" class="form-input" rows="4"
+                              placeholder="Mô tả chi tiết vấn đề bạn cần giảng viên hỗ trợ..."></textarea>
+                    <div class="form-error" th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}"></div>
+                </div>
+
+                <input type="hidden" th:field="*{studentId}"/>
+
+                <div class="booking-footer">
+                    <button type="reset" class="btn-secondary">Làm lại</button>
+                    <button type="button" class="btn-primary" onclick="handleConfirmBooking(event)">
+                        <i class="fa-solid fa-calendar-check"></i> Xác nhận đặt lịch
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-sidebar">
+            <div class="info-box">
+                <h4><i class="fa-solid fa-circle-info"></i> Quy định đặt lịch</h4>
+                <ul>
+                    <li>Đặt lịch trước ít nhất 24 giờ.</li>
+                    <li>Không đặt lịch vào các khung giờ giảng viên đã bận.</li>
+                    <li>Nội dung tư vấn phải rõ ràng, đúng chuyên môn.</li>
+                </ul>
+            </div>
+            <div class="info-box warning">
+                <h4><i class="fa-solid fa-triangle-exclamation"></i> Chống xung đột</h4>
+                <p>Hệ thống sẽ tự động chặn nếu giảng viên đã có lịch tư vấn khác. Vui lòng kiểm tra kỹ thời gian.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/script/alert2.js}"></script>
+
+    <script th:inline="javascript">
+        // 1. Hàm lọc giảng viên theo Khoa (Sử dụng Fetch API)
+        function filterLecturers() {
+            const deptId = document.getElementById('departmentSelect').value;
+            const lecturerSelect = document.getElementById('lecturerSelect');
+
+            lecturerSelect.innerHTML = '<option value="">Đang tải giảng viên...</option>';
+
+            if (!deptId) {
+                lecturerSelect.innerHTML = '<option value="">-- Vui lòng chọn khoa trước --</option>';
+                return;
+            }
+
+            fetch(`/api/lecturers?deptId=${deptId}`)
+                .then(res => res.json())
+                .then(data => {
+                    lecturerSelect.innerHTML = '<option value="">-- Chọn giảng viên --</option>';
+                    data.forEach(l => {
+                        const option = document.createElement('option');
+                        option.value = l.id;
+                        option.textContent = l.fullName;
+                        lecturerSelect.appendChild(option);
+                    });
+                })
+                .catch(() => {
+                    lecturerSelect.innerHTML = '<option value="">Lỗi tải dữ liệu!</option>';
+                });
+        }
+
+        // 2. Hàm gọi SweetAlert2 xác nhận
+        function handleConfirmBooking(event) {
+            // Lấy ID chuẩn xác của textarea
+            const topic = document.getElementById('topic').value;
+
+            if (!topic || topic.trim().length < 5) {
+                // Giờ thư viện đã được load, gọi showErrorAlert sẽ chạy ngon 100%
+                showErrorAlert("Vui lòng nhập nội dung tư vấn chi tiết hơn!");
+                return;
+            }
+
+            showConfirmDelete(
+                "Bạn có chắc chắn muốn đặt lịch tư vấn này không?",
+                "Xác nhận đặt lịch",
+                () => document.getElementById('bookingForm').submit()
+            );
+        }
+
+        // 3. Bắt thông báo từ Flash Attributes
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = [[${success}]];
+            const error = [[${error}]];
+
+            // Check nếu biến có tồn tại thì mới hiển thị Alert
+            if (success && success !== 'null') showSuccessAlert(success);
+            if (error && error !== 'null') showErrorAlert(error);
+        });
+    </script>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Giảng viên</title>
+</head>
+<body>
+
+<div th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/lecturer-dashboard.css}">
+
+    <div class="dash-header">
+        <div class="welcome-text">
+            <h1>Chào buổi chiều, <span th:text="${fullName != null ? fullName : 'Giảng viên'}">Thầy Duy</span>! ☕</h1>
+            <p>Dưới đây là tóm tắt hoạt động hướng dẫn đồ án của thầy trong hôm nay.</p>
+        </div>
+        <div class="header-actions">
+            <a th:href="@{/lecturer/appointments}" class="btn-approve-quick">
+                <i class="fa-solid fa-user-check"></i> Duyệt lịch ngay
+            </a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="stat-content">
+                <h3 th:text="${todaySessions != null ? todaySessions : '0'}">5</h3>
+                <p>Ca hướng dẫn hôm nay</p>
+            </div>
+            <div class="stat-deco"></div>
+        </div>
+
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="stat-content">
+                <h3 th:text="${pendingApprovals != null ? pendingApprovals : '0'}">12</h3>
+                <p>Yêu cầu chờ duyệt</p>
+            </div>
+            <div class="stat-deco"></div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div>
+            <div class="stat-content">
+                <h3 th:text="${totalStudents != null ? totalStudents : '0'}">48</h3>
+                <p>Sinh viên đã hỗ trợ</p>
+            </div>
+            <div class="stat-deco"></div>
+        </div>
+    </div>
+
+    <div class="dash-main-content">
+        <div class="panel upcoming-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Lịch hướng dẫn sắp tới
+                </div>
+                <a th:href="@{/lecturer/schedule}" class="view-all">Xem tất cả</a>
+            </div>
+
+            <div class="upcoming-list">
+                <div th:if="${upcomingSessions == null or upcomingSessions.isEmpty()}" class="empty-state">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1155/1155607.png" width="60">
+                    <p>Thầy chưa có lịch hướng dẫn nào sắp tới.</p>
+                </div>
+
+                <div class="session-item" th:each="item : ${upcomingSessions}">
+                    <div class="session-time">
+                        <span class="time" th:text="${#temporals.format(item.startTime, 'HH:mm')}">08:00</span>
+                        <span class="date" th:text="${#temporals.format(item.startTime, 'dd/MM')}">10/05</span>
+                    </div>
+                    <div class="session-info">
+                        <h4 th:text="${item.topic}">Tối ưu kiến trúc</h4>
+                        <p><i class="fa-solid fa-user"></i> SV: <span th:text="${item.studentName}">Tên SV</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel notice-panel">
+            <div class="panel-title"><i class="fa-solid fa-lightbulb"></i> Lưu ý cho Mentor</div>
+            <ul class="tip-list">
+                <li>
+                    <span class="bullet">1</span>
+                    <p>Hãy đánh giá ngay sau buổi học để sinh viên kịp thời nhận phản hồi.</p>
+                </li>
+                <li>
+                    <span class="bullet">2</span>
+                    <p>Nếu sinh viên cần thiết bị Lab, hãy tích chọn trong phần "Đánh giá".</p>
+                </li>
+                <li>
+                    <span class="bullet">3</span>
+                    <p>Thầy có thể từ chối lịch nếu sinh viên mô tả nội dung không rõ ràng.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

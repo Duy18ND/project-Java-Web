@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+    <title>Hồ sơ Cá nhân</title>
+</head>
+<body>
+
+<div th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+
+    <style>
+        .form-input, .form-select {
+            width: 100%; padding: 10px 15px; border: 1px solid #d1d5db;
+            border-radius: 8px; font-size: 14px; color: #1f2937;
+            background: #fff; transition: all 0.2s; box-sizing: border-box;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Custom cho thẻ select đẹp hơn */
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            cursor: pointer;
+        }
+
+        .lock-note { font-size: 12px; color: #9ca3af; margin-top: 4px; font-style: italic; }
+
+        .avatar-img-actual {
+            width: 100%; height: 100%; border-radius: 50%;
+            object-fit: cover; border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #dbeafe;
+        }
+    </style>
+
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1>Hồ sơ Cá nhân</h1>
+            <p>Quản lý thông tin định danh và học thuật của bạn</p>
+        </div>
+
+        <div class="profile-layout" th:if="${userProfile != null}">
+            <div class="sidebar">
+                <div class="card">
+                    <div class="avatar-wrap">
+                        <div class="avatar-ring">
+                            <div class="avatar-initials" id="avatarDisplay">
+                                <img th:if="${userProfile.avatarUrl != null}"
+                                     th:src="${userProfile.avatarUrl}"
+                                     class="avatar-img-actual">
+                                <span th:if="${userProfile.avatarUrl == null}"
+                                      th:text="${#strings.substring(userProfile.fullName, 0, 1)}">U</span>
+                            </div>
+
+                            <label class="avatar-upload-btn" for="avatarInput" title="Đổi ảnh đại diện">
+                                <i class="fa-solid fa-camera"></i>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+                        <p class="avatar-hint">JPG, PNG, Screenshots — tối đa 5MB</p>
+                        <p class="profile-name-sidebar" th:text="${userProfile.fullName}">Họ và tên</p>
+
+                        <div th:if="${lecturerInfo == null}" class="badge">
+                            <i class="fa-solid fa-user-graduate"></i> Sinh viên
+                        </div>
+                        <div th:if="${lecturerInfo != null}" class="badge lecturer">
+                            <i class="fa-solid fa-chalkboard-user"></i> Giảng viên
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-col">
+                <div class="card">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchTab('contact', this)">
+                            <i class="fa-solid fa-address-card"></i> Thông tin chung
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('password', this)">
+                            <i class="fa-solid fa-lock"></i> Đổi mật khẩu
+                        </button>
+                    </div>
+
+                    <div class="tab-panel active" id="tab-contact">
+                        <div class="warn-banner">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Vui lòng cập nhật thông tin còn thiếu. Các mục định danh sẽ bị khóa vĩnh viễn sau khi nhập.
+                        </div>
+
+                        <form id="profileForm" th:action="@{/profile/update}" method="post">
+                            <div class="info-grid">
+                                <div class="field span-2">
+                                    <label>Họ và tên</label>
+                                    <div class="locked"><i class="fa-solid fa-lock"></i> <span th:text="${userProfile.fullName}"></span></div>
+                                </div>
+
+                                <div class="field">
+                                    <label>Ngày sinh (Birth Date)</label>
+                                    <input type="date" name="birthDate" th:value="${userProfile.birthDate}" class="form-input">
+                                </div>
+
+                                <th:block th:if="${lecturerInfo != null}">
+                                    <div class="field">
+                                        <label>Chức danh</label>
+                                        <div th:if="${userProfile.academicRank != null and !userProfile.academicRank.isEmpty()}" class="locked">
+                                            <i class="fa-solid fa-lock"></i>
+                                            <span th:text="${userProfile.academicRank}"></span>
+                                        </div>
+                                        <select th:if="${userProfile.academicRank == null or userProfile.academicRank.isEmpty()}"
+                                                name="academicRank" class="form-select">
+                                            <option value="">-- Chọn chức danh (Optional) --</option>
+                                            <option value="Giảng viên">Giảng viên</option>
+                                            <option value="Giảng viên chính">Giảng viên chính</option>
+                                            <option value="Thạc sĩ">Thạc sĩ</option>
+                                            <option value="Tiến sĩ">Tiến sĩ</option>
+                                            <option value="Phó Giáo sư">Phó Giáo sư</option>
+                                            <option value="Giáo sư">Giáo sư</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="field"><label>Chuyên môn</label><div class="locked"><span th:text="${lecturerInfo.specialization}"></span></div></div>
+                                </th:block>
+
+                                <th:block th:if="${lecturerInfo == null}">
+                                    <div class="field">
+                                        <label>Mã sinh viên</label>
+                                        <div class="locked"><i class="fa-solid fa-lock"></i> <span th:text="${userProfile.studentCode != null ? userProfile.studentCode : 'Chưa cập nhật'}"></span></div>
+                                    </div>
+                                    <div class="field span-2">
+                                        <label>Khoa / Ngành đào tạo</label>
+                                        <div class="locked">
+                                            <i class="fa-solid fa-lock"></i>
+                                            <span th:text="${userProfile.department != null ? userProfile.department.name : 'Chưa cập nhật'}"></span>
+                                        </div>
+                                    </div>
+                                </th:block>
+
+                                <div class="field">
+                                    <label>Số điện thoại</label>
+                                    <div th:if="${userProfile.phoneNumber != null and !userProfile.phoneNumber.isEmpty()}" class="locked"><span th:text="${userProfile.phoneNumber}"></span></div>
+                                    <input th:if="${userProfile.phoneNumber == null or userProfile.phoneNumber.isEmpty()}" type="tel" name="phoneNumber" class="form-input" placeholder="Nhập SĐT...">
+                                </div>
+
+                                <div class="field">
+                                    <label>Email</label>
+                                    <div th:if="${userProfile.email != null and !userProfile.email.isEmpty()}" class="locked"><span th:text="${userProfile.email}"></span></div>
+                                    <input th:if="${userProfile.email == null or userProfile.email.isEmpty()}" type="email" name="email" class="form-input" placeholder="Nhập Email...">
+                                </div>
+                            </div>
+
+                            <div class="btn-row" style="margin-top: 25px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                                <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thông tin</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-panel" id="tab-password">
+                        <p class="section-title"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</p>
+                        <div class="info-grid cols-1" style="max-width:420px">
+                            <div class="field">
+                                <label>Mật khẩu hiện tại</label>
+                                <div class="pw-wrap">
+                                    <input type="password" id="pw-current" placeholder="Nhập mật khẩu hiện tại">
+                                    <i class="fa-solid fa-eye pw-eye" onclick="togglePw('pw-current', this)"></i>
+                                </div>
+                                <span class="err-msg" id="err-pw-current"></span>
+                            </div>
+                            <div class="field">
+                                <label>Mật khẩu mới</label>
+                                <div class="pw-wrap">
+                                    <input type="password" id="pw-new" placeholder="Tối thiểu 8 ký tự" oninput="checkStrength(this.value)">
+                                    <i class="fa-solid fa-eye pw-eye" onclick="togglePw('pw-new', this)"></i>
+                                </div>
+                                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                                <p class="strength-label" id="strengthLabel" style="color:#9ca3af"></p>
+                                <span class="err-msg" id="err-pw-new"></span>
+                            </div>
+                            <div class="field">
+                                <label>Xác nhận mật khẩu mới</label>
+                                <div class="pw-wrap">
+                                    <input type="password" id="pw-confirm" placeholder="Nhập lại mật khẩu mới">
+                                    <i class="fa-solid fa-eye pw-eye" onclick="togglePw('pw-confirm', this)"></i>
+                                </div>
+                                <span class="err-msg" id="err-pw-confirm"></span>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn primary" onclick="savePassword()">
+                                <i class="fa-solid fa-shield-halved"></i> Cập nhật mật khẩu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/script/profile.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/script/alert2.js}"></script>
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            const successMsg = [[${success}]];
+            const errorMsg = [[${error}]];
+            if (successMsg) showSuccessAlert(successMsg);
+            if (errorMsg) showErrorAlert(errorMsg);
+        });
+    </script>
+</div>
+</body>
+</html>

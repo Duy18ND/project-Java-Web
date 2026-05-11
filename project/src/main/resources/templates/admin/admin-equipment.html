@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Thiết bị</title>
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <div class="admin-page-header">
+        <div>
+            <h1 class="admin-page-title">Quản lý Thiết bị</h1>
+            <p class="admin-page-subtitle">Danh sách tất cả thiết bị và tài liệu trong phòng Lab</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="openAddModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" x2="12" y1="5" y2="19"/>
+                <line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+            Thêm thiết bị mới
+        </button>
+    </div>
+
+    <form action="/admin/equipment" method="get" id="filterForm">
+        <div class="filter-bar">
+            <div class="search-desktop-wrapper" style="display:block; flex:1; max-width:320px;">
+                <div class="search-icon-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                </div>
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm thiết bị..."
+                       class="search-input" style="width:100%;"
+                       onkeypress="if(event.keyCode==13) { this.form.submit(); return false; }"/>
+            </div>
+
+            <select name="labId" class="filter-select" onchange="document.getElementById('filterForm').submit();">
+                <option value="">Tất cả loại phòng</option>
+                <th:block th:if="${labs != null}">
+                    <option th:each="l : ${labs}"
+                            th:value="${l.id}"
+                            th:text="${l.name}"
+                            th:selected="${selectedLabId != null and selectedLabId == l.id}"></option>
+                </th:block>
+            </select>
+
+            <button type="submit" style="display: none;">Lọc</button>
+        </div>
+    </form>
+
+    <div class="chart-card" style="margin-top:0;">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Mã thiết bị</th>
+                <th>Tên thiết bị / Tài liệu</th>
+                <th>Loại phòng</th>
+                <th>SL Tổng</th>
+                <th>Tồn kho</th>
+                <th>Đang mượn</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${equipments != null and !equipments.isEmpty()}">
+                <tr th:each="e : ${equipments}">
+                    <td class="table-id" th:text="${'EQ-' + e.id}">ID</td>
+                    <td>
+                        <div class="equipment-name-cell">
+                            <div class="equipment-icon-box" th:text="${e.category == 'DOCUMENT' ? '📚' : '🔌'}">🔌</div>
+                            <div>
+                                <p class="equipment-name" th:text="${e.name}">Tên</p>
+                                <p class="equipment-meta" th:text="${e.category}">Loại</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${e.labName}">Phòng Lab</td>
+                    <td class="text-center fw-600" th:text="${e.totalQuantity}">0</td>
+                    <td class="text-center fw-600"
+                        th:classappend="${e.availableQuantity == 0 ? 'text-red' : (e.availableQuantity < 5 ? 'text-amber' : 'text-green')}"
+                        th:text="${e.availableQuantity}">0
+                    </td>
+                    <td class="text-center" th:text="${e.totalQuantity - e.availableQuantity}">0</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${e.availableQuantity == 0 ? 'badge-out' : (e.availableQuantity < 5 ? 'badge-warn' : 'badge-approved')}"
+                              th:text="${e.availableQuantity == 0 ? 'Hết hàng' : (e.availableQuantity < 5 ? 'Sắp hết' : 'Còn hàng')}">
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-edit"
+                                    th:onclick="'openEditModal(' + ${e.id} + ')'">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                </svg>
+                            </button>
+                            <a th:href="@{/admin/equipment/delete/{id}(id=${e.id})}"
+                               class="action-btn action-delete"
+                               onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Bạn muốn xóa thiết bị này khỏi danh sách?', 'Xác nhận xóa', () => window.location.href = url);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </th:block>
+            <tr th:if="${equipments == null or equipments.isEmpty()}">
+                <td colspan="8" style="text-align: center; padding: 40px; color: #64748b;">
+                    Không tìm thấy thiết bị nào phù hợp.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination-wrapper" th:if="${totalPages != null}">
+            <div class="pagination-buttons">
+                <a th:href="@{/admin/equipment(page=0, keyword=${keyword}, labId=${selectedLabId})}"
+                   class="btn-pagination" title="Trang đầu"
+                   th:style="${currentPage == 0 ? 'pointer-events: none; opacity: 0.5;' : ''}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                </a>
+                <a th:href="@{/admin/equipment(page=${currentPage - 1}, keyword=${keyword}, labId=${selectedLabId})}"
+                   class="btn-pagination" title="Trang trước"
+                   th:style="${currentPage == 0 ? 'pointer-events: none; opacity: 0.5;' : ''}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </a>
+                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <th:block th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
+                        <a th:href="@{/admin/equipment(page=${i}, keyword=${keyword}, labId=${selectedLabId})}"
+                           class="btn-pagination"
+                           th:classappend="${currentPage == i ? 'active' : ''}"
+                           th:text="${i + 1}">1</a>
+                    </th:block>
+                </th:block>
+                <a th:href="@{/admin/equipment(page=${currentPage + 1}, keyword=${keyword}, labId=${selectedLabId})}"
+                   class="btn-pagination" title="Trang sau"
+                   th:style="${currentPage + 1 >= totalPages ? 'pointer-events: none; opacity: 0.5;' : ''}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+                <a th:href="@{/admin/equipment(page=${totalPages - 1}, keyword=${keyword}, labId=${selectedLabId})}"
+                   class="btn-pagination" title="Trang cuối"
+                   th:style="${currentPage + 1 >= totalPages ? 'pointer-events: none; opacity: 0.5;' : ''}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                </a>
+            </div>
+            <div class="pagination-info">
+                Hiển thị <b>[[${equipments.size()}]]</b> trên tổng <b>[[${totalItems}]]</b> thiết bị
+            </div>
+        </div>
+    </div>
+
+    <!--
+        FIX MODAL: Dùng hoàn toàn inline style thay vì class modal-overlay
+        Lý do: tránh CSS class ghi đè display, đảm bảo position:fixed thoát khỏi <main>
+    -->
+    <div id="addModal"
+         style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                background:rgba(0,0,0,0.5); z-index:9999;
+                align-items:center; justify-content:center;">
+        <div class="modal-box">
+            <form th:action="@{/admin/equipment/save}" th:object="${equipmentDto}" method="post">
+                <input type="hidden" th:field="*{id}" id="form-id">
+
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Thêm thiết bị mới</h3>
+                    <button type="button" class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Tên thiết bị *</label>
+                        <input type="text" th:field="*{name}" id="form-name" class="form-input" required/>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phòng Lab *</label>
+                            <select th:field="*{labId}" id="form-lab" class="form-input" required>
+                                <option value="">Chọn phòng</option>
+                                <th:block th:if="${labs != null}">
+                                    <option th:each="l : ${labs}" th:value="${l.id}" th:text="${l.name}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số lượng tổng *</label>
+                            <input type="number" th:field="*{totalQuantity}" id="form-total" class="form-input" min="1" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Loại danh mục</label>
+                        <select th:field="*{category}" id="form-cate" class="form-input">
+                            <option value="HARDWARE">Thiết bị / Linh kiện</option>
+                            <option value="DOCUMENT">Tài liệu / Sách</option>
+                        </select>
+                    </div>
+                    <input type="hidden" th:field="*{availableQuantity}" id="form-avail">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        // Hiện alert nếu có flash message từ server
+        document.addEventListener("DOMContentLoaded", function () {
+            var successMsg = /*[[${success}]]*/ null;
+            var errorMsg   = /*[[${error}]]*/ null;
+
+            if (successMsg) {
+                if (typeof showSuccessAlert === "function") showSuccessAlert(successMsg);
+                else alert(successMsg);
+            }
+            if (errorMsg) {
+                if (typeof showErrorAlert === "function") showErrorAlert(errorMsg);
+                else alert(errorMsg);
+            }
+        });
+
+        // Mở modal THÊM MỚI
+        function openAddModal() {
+            const modal = document.getElementById('addModal');
+            if (!modal) { console.error("Không tìm thấy #addModal"); return; }
+
+            document.getElementById('modalTitle').innerText = "Thêm thiết bị mới";
+            const form = modal.querySelector('form');
+            if (form) form.reset();
+            document.getElementById('form-id').value = "";
+
+            modal.style.display = 'flex'; // flex để căn giữa
+        }
+
+        // Mở modal SỬA — fetch data từ API
+        function openEditModal(id) {
+            const modal = document.getElementById('addModal');
+            if (!modal) { console.error("Không tìm thấy #addModal"); return; }
+
+            fetch('/admin/equipment/api/' + id)
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    document.getElementById('modalTitle').innerText     = "Chỉnh sửa thiết bị";
+                    document.getElementById('form-id').value            = data.id            ?? '';
+                    document.getElementById('form-name').value          = data.name          ?? '';
+                    document.getElementById('form-lab').value           = data.labId         ?? '';
+                    document.getElementById('form-total').value         = data.totalQuantity  ?? 0;
+                    document.getElementById('form-avail').value         = data.availableQuantity ?? 0;
+                    document.getElementById('form-cate').value          = data.category      ?? 'HARDWARE';
+
+                    modal.style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error("Lỗi Fetch:", err);
+                    alert("Không tải được dữ liệu thiết bị: " + err.message);
+                });
+        }
+
+        // Đóng modal
+        function closeModal() {
+            const modal = document.getElementById('addModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Click ra ngoài modal-box thì đóng
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('addModal');
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        });
+
+        /*]]>*/
+    </script>
+</div>
+</body>
+</html>

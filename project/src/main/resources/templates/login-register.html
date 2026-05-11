@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập / Đăng ký - Smart Lab Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login-register.css}">
+</head>
+<body>
+
+<div class="auth-wrapper" id="loginView">
+    <div class="header">
+        <h1>Đăng Nhập</h1>
+    </div>
+
+    <form th:action="@{/login}" method="POST">
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label class="label" for="loginUsername">Tên đăng nhập</label>
+                <input class="input" id="loginUsername" name="username" placeholder="Nhập tên đăng nhập" required type="text" />
+            </div>
+
+            <div class="form-group">
+                <div class="label-wrapper">
+                    <label class="label" for="loginPassword">Mật khẩu</label>
+                    <a href="#" class="link">Quên mật khẩu?</a>
+                </div>
+                <div class="input-container">
+                    <input class="input" id="loginPassword" name="password" required type="password" placeholder="••••••••" />
+                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+        </div>
+    </form>
+
+    <p class="footer-text">
+        Chưa có tài khoản?
+        <a class="link" style="text-underline-offset: 4px; cursor: pointer;" id="showRegisterBtn">Đăng ký ngay</a>
+    </p>
+</div>
+
+<div class="auth-wrapper hidden" id="registerView">
+    <div class="header">
+        <h1>Đăng Ký</h1>
+    </div>
+
+    <form th:action="@{/register}" method="POST" th:object="${registerRequest}">
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label class="label" for="regName">Họ và tên</label>
+                <input class="input" id="regName" th:field="*{fullName}" placeholder="Nguyễn Văn A" type="text" />
+                <span class="error-text" th:if="${#fields.hasErrors('fullName')}" th:text="${#fields.errors('fullName')[0]}"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="regEmail">Email</label>
+                <input class="input" id="regEmail" th:field="*{email}" placeholder="sv@example.com" type="text" />
+                <span class="error-text" th:if="${#fields.hasErrors('email')}" th:text="${#fields.errors('email')[0]}"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="regUsername">Tên đăng nhập</label>
+                <input class="input" id="regUsername" th:field="*{username}" placeholder="Nhập tên đăng nhập" type="text" />
+                <span class="error-text" th:if="${#fields.hasErrors('username')}" th:text="${#fields.errors('username')[0]}"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="regPhone">Số điện thoại</label>
+                <input class="input" id="regPhone" th:field="*{phoneNumber}" placeholder="0987654321" type="text" />
+                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}" th:text="${#fields.errors('phoneNumber')[0]}"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="regPassword">Mật khẩu</label>
+                <div class="input-container">
+                    <input class="input" id="regPassword" name="password" th:value="*{password}" type="password" placeholder="••••••••" />
+                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('regPassword', this)"></i>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('password')}" th:text="${#fields.errors('password')[0]}"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="regConfirmPassword">Xác nhận mật khẩu</label>
+                <div class="input-container">
+                    <input class="input" id="regConfirmPassword" name="confirmPassword" th:value="*{confirmPassword}" type="password" placeholder="••••••••" />
+                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('regConfirmPassword', this)"></i>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('confirmPassword')}" th:text="${#fields.errors('confirmPassword')[0]}"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+        </div>
+    </form>
+
+    <p class="footer-text">
+        Đã có tài khoản?
+        <a class="link" style="text-underline-offset: 4px; cursor: pointer;" id="showLoginBtn">Đăng nhập</a>
+    </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:src="@{/script/alert2.js}"></script>
+<script th:src="@{/script/login-register.js}"></script>
+
+</body>
+</html>

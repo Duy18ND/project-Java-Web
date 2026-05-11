@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh Sách Chờ Duyệt</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<div th:fragment="content">
+
+    <style>
+        /* ===== CSS NÚT DUYỆT & TỪ CHỐI ===== */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none !important;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #e6fced;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .btn-edit:hover {
+            background-color: #059669;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ===== CSS ALERT (THÔNG BÁO) ===== */
+        .alert-custom-box {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid transparent;
+        }
+        .alert-success-theme {
+            background-color: #e6fced;
+            color: #059669;
+            border-left-color: #059669;
+        }
+        .alert-error-theme {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-left-color: #dc2626;
+        }
+    </style>
+
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Yêu cầu tư vấn đang chờ</h1>
+        <p class="admin-page-subtitle">Thầy/Cô vui lòng xem xét nội dung và xác nhận lịch hẹn cho sinh viên.</p>
+    </div>
+
+    <div th:if="${success}" class="alert-custom-box alert-success-theme" role="alert">
+        <i class="fa-solid fa-circle-check" style="font-size: 18px;"></i>
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${error}" class="alert-custom-box alert-error-theme" role="alert">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 18px;"></i>
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="card" style="margin-top: 5px; padding: 20px; border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+        <table class="admin-table" th:if="${pendingList != null and !pendingList.isEmpty()}" style="width: 100%;">
+            <thead>
+            <tr>
+                <th style="padding: 15px; border-bottom: 2px solid #f1f5f9;">Sinh viên</th>
+                <th style="padding: 15px; border-bottom: 2px solid #f1f5f9;">Thời gian</th>
+                <th style="padding: 15px; border-bottom: 2px solid #f1f5f9;">Chủ đề tư vấn</th>
+                <th style="padding: 15px; border-bottom: 2px solid #f1f5f9; text-align: center;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${pendingList}">
+                <td style="padding: 15px; border-bottom: 1px solid #f8fafc;">
+                    <strong th:text="${item.studentName}" style="color: #1e293b;">Tên SV</strong>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Mã SV: <span th:text="${item.studentId}"></span></div>
+                </td>
+                <td style="padding: 15px; border-bottom: 1px solid #f8fafc;">
+                    <div th:text="${#temporals.format(item.startTime, 'HH:mm - dd/MM/yyyy')}" style="font-weight: 500; color: #4318ff;">Thời gian</div>
+                </td>
+                <td th:text="${item.topic}" style="padding: 15px; border-bottom: 1px solid #f8fafc; max-width: 300px; white-space: normal; color: #475569;">Chủ đề</td>
+                <td style="padding: 15px; border-bottom: 1px solid #f8fafc;">
+                    <div style="display: flex; gap: 8px; justify-content: center;">
+                        <a th:href="@{'/lecturer/approve/' + ${item.id}}" class="btn-action btn-edit" title="Chấp nhận">
+                            <i class="fa-solid fa-check"></i> Duyệt
+                        </a>
+                        <a th:href="@{'/lecturer/reject/' + ${item.id}}"
+                           class="btn-action btn-delete"
+                           onclick="return confirm('Thầy/Cô chắc chắn muốn từ chối yêu cầu này?')" title="Từ chối">
+                            <i class="fa-solid fa-xmark"></i> Từ chối
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${pendingList == null or pendingList.isEmpty()}" style="text-align: center; padding: 60px 0;">
+            <i class="fa-solid fa-mug-hot" style="font-size: 54px; color: #cbd5e1; margin-bottom: 20px;"></i>
+            <h5 style="color: #475569; font-weight: 600;">Tuyệt vời!</h5>
+            <p style="color: #64748b;">Hiện tại Thầy/Cô không có yêu cầu nào đang chờ duyệt. Hãy nghỉ ngơi một chút nhé!</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

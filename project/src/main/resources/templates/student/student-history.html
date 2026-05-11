@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ sơ học thuật</title>
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <style>
+        /* ==========================================
+           ĐÃ FIX: CSS MODAL SỬ DỤNG OPACITY ĐỂ CHỐNG LỖI HIỂN THỊ
+           ========================================== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);
+
+            /* Dùng visibility và opacity thay cho display:none để chống kẹt CSS */
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Khi modal có thêm class .show, nó sẽ hiện lên mượt mà */
+        .modal-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: #fff; border-radius: 16px; width: 90%; max-width: 600px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 25px; border-bottom: 1px solid #e5e7eb; display: flex;
+            justify-content: space-between; align-items: center; background: #f8fafc;
+        }
+        .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; font-weight: 700; }
+        .btn-close { background: none; border: none; font-size: 20px; color: #64748b; cursor: pointer; transition: color 0.2s; }
+        .btn-close:hover { color: #ef4444; }
+        .modal-body { padding: 25px; }
+
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .detail-item.full-width { grid-column: 1 / -1; }
+        .detail-label { font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
+
+        .topic-box {
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px;
+            border-radius: 8px; color: #1e293b; font-size: 14px; line-height: 1.6;
+            white-space: pre-wrap; font-style: italic;
+        }
+        .detail-value { font-size: 14px; color: #0f172a; font-weight: 500; }
+
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #e5e7eb; text-align: right; background: #f8fafc; }
+        .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        .equip-list { margin: 8px 0 0 20px; padding: 0; color: #334155; }
+        .equip-list li { margin-bottom: 4px; font-weight: 500; font-size: 14px;}
+    </style>
+
+    <div class="admin-page-header">
+        <div>
+            <h1 class="admin-page-title">Hồ sơ học thuật & Thiết bị</h1>
+            <p class="admin-page-subtitle">Theo dõi kết quả cố vấn và trạng thái mượn trả thiết bị</p>
+        </div>
+    </div>
+
+    <div class="history-card">
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                <tr>
+                    <th width="5%">#</th>
+                    <th width="30%">Nội dung & Giảng viên</th>
+                    <th width="20%">Thời gian</th>
+                    <th width="15%">Trạng thái</th>
+                    <th width="18%">Hồ sơ liên kết</th>
+                    <th width="12%" style="text-align: center;">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:if="${historyList == null or historyList.isEmpty()}">
+                    <td colspan="6" style="text-align: center; padding: 50px; color: #94a3b8;">
+                        <i class="fa-regular fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>Bạn chưa có lịch sử tư vấn nào.</p>
+                    </td>
+                </tr>
+
+                <tr th:each="item, stat : ${historyList}">
+                    <td th:text="${stat.count}">1</td>
+                    <td>
+                        <div class="topic-info">
+                            <b th:text="${item.topic}">Chủ đề tư vấn</b>
+                            <span><i class="fa-solid fa-user-tie"></i> GV. <span th:text="${item.lecturerName != null ? item.lecturerName : 'Đang cập nhật'}">Tên giảng viên</span></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500;">
+                            <i class="fa-regular fa-calendar" style="color: #64748b; margin-right: 5px;"></i>
+                            <span th:text="${#temporals.format(item.startTime, 'dd/MM/yyyy')}">10/05/2026</span>
+                        </div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                            <i class="fa-regular fa-clock" style="margin-right: 5px;"></i>
+                            <span th:text="${#temporals.format(item.startTime, 'HH:mm')}">08:00</span> -
+                            <span th:text="${#temporals.format(item.endTime, 'HH:mm')}">10:00</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span th:if="${item.status == 'PENDING'}" class="status-badge status-pending">
+                            <i class="fa-solid fa-spinner fa-spin-pulse" style="margin-right: 5px;"></i> Chờ duyệt
+                        </span>
+                        <span th:if="${item.status == 'ACCEPTED'}" class="status-badge status-accepted" style="background: #dbeafe; color: #1d4ed8; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            <i class="fa-solid fa-calendar-check" style="margin-right: 5px;"></i> Đã chốt lịch
+                        </span>
+                        <span th:if="${item.status == 'COMPLETED'}" class="status-badge status-completed">
+                            <i class="fa-solid fa-circle-check" style="margin-right: 5px;"></i> Hoàn thành
+                        </span>
+                        <span th:if="${item.status == 'CANCELLED'}" class="status-badge status-cancelled">
+                            <i class="fa-solid fa-circle-xmark" style="margin-right: 5px;"></i> Đã hủy
+                        </span>
+                    </td>
+                    <td>
+                        <div class="linked-records">
+                            <div th:if="${item.evaluationId != null}" class="record-item eval">
+                                <i class="fa-solid fa-star"></i> Đã có đánh giá
+                            </div>
+                            <div th:if="${item.borrowingRecordId != null}" class="record-item equip">
+                                <i class="fa-solid fa-microchip"></i> Kèm thiết bị mượn
+                            </div>
+                            <div th:if="${item.evaluationId == null and item.borrowingRecordId == null}" class="record-item none" style="color: #94a3b8; font-size: 12px;">
+                                Chưa có dữ liệu
+                            </div>
+                        </div>
+                    </td>
+
+                    <td style="text-align: center;">
+                        <button type="button" th:if="${item.status == 'PENDING' or item.status == 'ACCEPTED'}"
+                                class="btn-cancel"
+                                th:onclick="'handleCancel(' + ${item.id} + ')'"
+                                style="margin-bottom: 5px;">
+                            <i class="fa-solid fa-ban"></i> Hủy lịch
+                        </button>
+
+                        <button type="button" th:if="${item.status != 'PENDING'}" class="btn-view"
+                                th:data-topic="${item.topic}"
+                                th:data-lecturer="${item.lecturerName}"
+                                th:data-date="${#temporals.format(item.startTime, 'dd/MM/yyyy')}"
+                                th:data-time="|${#temporals.format(item.startTime, 'HH:mm')} - ${#temporals.format(item.endTime, 'HH:mm')}|"
+                                th:data-eval="${item.evaluationId}"
+                                th:data-score="${item.score}"
+                                th:data-feedback="${item.feedback}"
+                                th:data-borrow="${item.borrowingRecordId}"
+                                th:data-borrow-status="${item.borrowingStatus}"
+                                th:data-equipments="${item.borrowedEquipments}"
+                                onclick="openDetailModal(this)">
+                            <i class="fa-solid fa-eye"></i> Xem
+                        </button>
+
+                        <button type="button" th:if="${item.borrowingRecordId != null and item.borrowingStatus == 'BORROWING'}"
+                                class="btn-return"
+                                th:onclick="'handleReturn(' + ${item.borrowingRecordId} + ')'"
+                                style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 5px; width: 100%;">
+                            <i class="fa-solid fa-rotate-left"></i> Trả đồ
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-circle-info" style="color: #3b82f6; margin-right: 8px;"></i> Chi tiết Hồ sơ học thuật</h3>
+                <button type="button" class="btn-close" onclick="closeDetailModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item full-width">
+                        <div class="detail-label"><i class="fa-solid fa-comment-dots"></i> Nội dung / Chủ đề tư vấn</div>
+                        <div class="topic-box" id="md-topic">...</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Giảng viên hướng dẫn</div>
+                        <div class="detail-value" id="md-lecturer">...</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Khung thời gian</div>
+                        <div class="detail-value" id="md-datetime">...</div>
+                    </div>
+
+                    <div class="detail-item full-width" style="border-top: 1px dashed #e5e7eb; padding-top: 15px; margin-top: 5px;">
+                        <div class="detail-label"><i class="fa-solid fa-toolbox"></i> Chi tiết Thiết bị mượn</div>
+                        <div class="detail-value" id="md-borrow">...</div>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <div class="detail-label"><i class="fa-solid fa-clipboard-check"></i> Đánh giá từ Giảng viên</div>
+                        <div class="detail-value" id="md-eval">...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeDetailModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var successMsg = /*[[${success}]]*/ null;
+            var errorMsg = /*[[${error}]]*/ null;
+
+            if (successMsg && typeof showSuccessAlert === "function") {
+                showSuccessAlert(successMsg);
+            }
+            if (errorMsg && typeof showErrorAlert === "function") {
+                showErrorAlert(errorMsg);
+            }
+        });
+
+        function handleCancel(sessionId) {
+            if (typeof showConfirmDelete === "function") {
+                showConfirmDelete(
+                    "Bạn có chắc chắn muốn hủy lịch cố vấn này không? Khung giờ này sẽ được giải phóng cho sinh viên khác.",
+                    "Xác nhận hủy lịch",
+                    () => { window.location.href = "/student/mentoring/cancel/" + sessionId; }
+                );
+            } else {
+                if(confirm("Xác nhận hủy lịch?")) window.location.href = "/student/mentoring/cancel/" + sessionId;
+            }
+        }
+
+        function handleReturn(borrowId) {
+            if (typeof showConfirmDelete === "function") {
+                showConfirmDelete(
+                    "Bạn xác nhận mang thiết bị đến phòng Lab để hoàn trả? Tồn kho sẽ được cập nhật lại ngay lập tức.",
+                    "Xác nhận trả thiết bị",
+                    () => { window.location.href = "/student/mentoring/return/" + borrowId; }
+                );
+            } else {
+                if(confirm("Xác nhận trả thiết bị?")) window.location.href = "/student/mentoring/return/" + borrowId;
+            }
+        }
+
+        function openDetailModal(button) {
+            const topic = button.getAttribute('data-topic') || 'Không có';
+            const lecturer = button.getAttribute('data-lecturer') || 'Đang cập nhật';
+            const date = button.getAttribute('data-date') || '';
+            const time = button.getAttribute('data-time') || '';
+            const evalId = button.getAttribute('data-eval');
+            const score = button.getAttribute('data-score');
+            const feedback = button.getAttribute('data-feedback');
+            const borrowId = button.getAttribute('data-borrow');
+            const borrowStatus = button.getAttribute('data-borrow-status');
+            const equipments = button.getAttribute('data-equipments');
+
+            // 1. Render Thông tin chung
+            document.getElementById('md-topic').innerText = `"${topic}"`;
+            document.getElementById('md-lecturer').innerHTML = `<i class="fa-solid fa-user-tie" style="color:#64748b; margin-right:6px;"></i> GV. ${lecturer}`;
+            document.getElementById('md-datetime').innerHTML = `<i class="fa-regular fa-clock" style="color:#64748b; margin-right:6px;"></i> ${date} | ${time}`;
+
+            // 2. Render Danh sách Thiết bị
+            let statusText = '';
+            let statusColor = '';
+            if (borrowStatus === 'BORROWING') { statusText = 'Đang mượn'; statusColor = '#f59e0b'; }
+            else if (borrowStatus === 'RETURNED') { statusText = 'Đã trả'; statusColor = '#10b981'; }
+            else if (borrowStatus === 'PENDING') { statusText = 'Admin đang chờ duyệt'; statusColor = '#64748b'; }
+            else { statusText = 'Đang xử lý'; statusColor = '#64748b'; }
+
+            let equipListHtml = '<span style="color: #64748b; font-style: italic;">Chưa có dữ liệu</span>';
+            if (equipments && equipments !== 'null' && equipments.trim() !== '') {
+                // Sửa lỗi split khoảng trắng bảo đảm cắt chuỗi chuẩn xác
+                const equipArray = equipments.split(',').map(e => e.trim());
+                equipListHtml = '<ul class="equip-list">';
+                equipArray.forEach(eq => {
+                    equipListHtml += `<li><i class="fa-solid fa-caret-right" style="color: ${statusColor}; margin-right: 6px;"></i>${eq}</li>`;
+                });
+                equipListHtml += '</ul>';
+            }
+
+            const borrowHtml = borrowId && borrowId !== 'null'
+                ? `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                     <div style="color: #0284c7; font-weight: 600; font-size: 15px;">
+                        <i class="fa-solid fa-barcode"></i> Mã phiếu mượn: #${borrowId}
+                     </div>
+                     <span style="background: ${statusColor}; color: white; font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 600;">${statusText}</span>
+                   </div>
+                   <div style="font-size: 14px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid ${statusColor}">
+                     <b style="color: #1e293b;">Danh sách thiết bị được cấp:</b>
+                     ${equipListHtml}
+                   </div>`
+                : `<div style="color: #94a3b8; padding: 10px; background: #f8fafc; border-radius: 8px; text-align: center;"><i class="fa-solid fa-ban" style="margin-right: 5px;"></i> Lịch hẹn này không yêu cầu mượn thiết bị phòng Lab</div>`;
+
+            document.getElementById('md-borrow').innerHTML = borrowHtml;
+
+            // 3. Render Đánh giá
+            const evalHtml = evalId && evalId !== 'null'
+                ? `<div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px;">
+                     <div style="color: #15803d; font-weight: 700; margin-bottom: 8px;">
+                       <i class="fa-solid fa-star" style="color: #f59e0b;"></i> Điểm số: <span style="font-size: 18px;">${score}</span> / 10
+                     </div>
+                     <div style="font-size: 14px; color: #166534; line-height: 1.6;">
+                       <i class="fa-solid fa-quote-left" style="opacity: 0.4; font-size: 18px; margin-right: 5px; float: left;"></i>
+                       ${feedback}
+                     </div>
+                   </div>`
+                : `<div style="color: #94a3b8; padding: 10px; background: #f8fafc; border-radius: 8px; text-align: center;"><i class="fa-solid fa-clock-rotate-left" style="margin-right: 5px;"></i> Chưa có đánh giá từ Giảng viên</div>`;
+
+            document.getElementById('md-eval').innerHTML = evalHtml;
+
+            // Mở Modal bằng cách thêm class .show
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        function closeDetailModal() {
+            // Đóng Modal bằng cách gỡ class .show
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        // Bấm ra ngoài khoảng đen để đóng Modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeDetailModal();
+            }
+        };
+        /*]]>*/
+    </script>
+</div>
+
+</body>
+</html>

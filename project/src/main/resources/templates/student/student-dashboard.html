@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tổng quan Học tập</title>
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Xin Chào: <span th:text="${fullName != null ? fullName : 'Sinh viên'}">Đoàn Mạnh Duy</span>! 👋</h1>
+            <p>Hôm nay là một ngày tuyệt vời để tiếp tục phát triển đồ án của bạn.</p>
+        </div>
+        <i class="fas fa-rocket dashboard-header-icon"></i>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3 th:text="${totalSessions != null ? totalSessions : '3'}">3</h3>
+                <p>Tổng ca tư vấn</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3 th:text="${pendingSessions != null ? pendingSessions : '1'}">1</h3>
+                <p>Ca đang chờ duyệt</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <div class="stat-info">
+                <h3 th:text="${borrowedDevices != null ? borrowedDevices : '2'}">2</h3>
+                <p>Thiết bị đang mượn</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+
+        <div class="dash-panel">
+            <div class="dash-panel-title">
+                <i class="fa-solid fa-bolt"></i> Hoạt động gần đây
+            </div>
+
+            <table class="custom-table" style="font-size: 14px;">
+                <thead>
+                <tr>
+                    <th width="40%">Chủ đề tư vấn</th>
+                    <th width="30%">Thời gian</th>
+                    <th width="30%">Trạng thái</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${recentActivities == null or recentActivities.isEmpty()}">
+                    <td colspan="3" style="text-align: center; color: #9ca3af; padding: 20px;">
+                        Bạn chưa có lịch hẹn tư vấn nào.
+                    </td>
+                </tr>
+
+                <tr th:each="item, stat : ${recentActivities}" th:if="${stat.index < 3}">
+                    <td style="font-weight: 600; color: #1f2937;" th:text="${item.topic}">Tên chủ đề</td>
+                    <td>
+                        <i class="fa-regular fa-clock" style="color: #9ca3af;"></i>
+                        <span th:text="${#temporals.format(item.startTime, 'dd/MM/yyyy HH:mm')}">14/05/2026 09:35</span>
+                    </td>
+                    <td>
+                            <span th:if="${item.status == 'PENDING'}" class="badge badge-pending">
+                                <i class="fas fa-spinner fa-spin-pulse"></i> Chờ xác nhận
+                            </span>
+                        <span th:if="${item.status == 'COMPLETED'}" class="badge badge-completed">
+                                <i class="fas fa-circle-check"></i> Đã hoàn thành
+                            </span>
+                        <span th:if="${item.status == 'CANCELLED'}" class="badge" style="background: #f1f5f9; color: #475569;">
+                                <i class="fas fa-circle-xmark"></i> Đã hủy
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <a th:href="@{/student/mentoring/history}" style="color: #3b82f6; font-size: 13px; font-weight: 600; text-decoration: none;">
+                    Xem toàn bộ lịch sử <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="dash-panel">
+            <div class="dash-panel-title">
+                <i class="fa-solid fa-lightbulb"></i> Mẹo học tập
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="tip-text">
+                    <h4>Chuẩn bị trước câu hỏi</h4>
+                    <p>Hãy note lại các lỗi (bug) hoặc vấn đề cụ thể trước khi gặp giảng viên để tiết kiệm thời gian.</p>
+                </div>
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="tip-text">
+                    <h4>Mượn thiết bị Lab</h4>
+                    <p>Nếu đồ án cần phần cứng (Arduino, Kính VR), hãy nhắn giảng viên thêm vào phiếu mượn sau buổi tư vấn.</p>
+                </div>
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fa-solid fa-bell"></i></div>
+                <div class="tip-text">
+                    <h4>Hủy lịch khi bận</h4>
+                    <p>Nhớ hủy lịch trước 24h nếu bạn không thể tham gia để nhường slot cho các bạn khác nhé!</p>
+                </div>
+            </div>
+
+            <a th:href="@{/student/mentoring/book}" class="btn-primary" style="display: block; text-align: center; margin-top: 20px; text-decoration: none; padding: 10px;">
+                <i class="fa-solid fa-plus"></i> Đặt lịch mới ngay
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

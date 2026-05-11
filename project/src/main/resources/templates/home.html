@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Lab Platform</title>
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-equipment.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-borrow-requests.css}">
+    <link rel="stylesheet" th:href="@{/css/booking-session.css}">
+    <link rel="stylesheet" th:href="@{/css/student-custom.css}">
+    <link rel="stylesheet" th:href="@{/css/schedule.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/script/alert2.js}"></script>
+</head>
+<body style="margin: 0; background-color: #f9fafb;">
+
+<!--Navbar-->
+<div th:replace="~{layouts/layout :: navbar}"></div>
+
+<!--Content-->
+<main style="padding: 20px;">
+    <div th:replace="~{${view} :: content}"></div>
+</main>
+
+<!--Footer-->
+<div th:replace="~{layouts/layout :: footer}"></div>
+<script th:src="@{/script/navbar.js}" defer></script>
+</body>
+</html>

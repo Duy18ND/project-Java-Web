@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Trình Giảng Dạy</title>
+    <link rel="stylesheet" th:href="@{/css/schedule.css}">
+</head>
+<body>
+
+<div class="schedule-wrapper" th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/schedule.css}">
+
+    <style>
+        .eq-item input[type="checkbox"]:checked + .eq-card {
+            border-color: #4318ff !important;
+            background: #ffffff !important;
+            box-shadow: 0 5px 15px rgba(67, 24, 255, 0.1) !important;
+        }
+        .eq-item input[type="checkbox"]:checked + .eq-card i {
+            color: #4318ff !important;
+        }
+    </style>
+
+    <div th:if="${success}" class="alert-success-box" role="alert">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-circle-check"></i>
+            <span th:text="${success}"></span>
+        </div>
+    </div>
+
+    <div th:if="${error}" class="alert-success-box" role="alert" style="background-color: #ffe8e8; color: #d32f2f; border-left-color: #d32f2f;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <div class="schedule-card">
+        <div class="card-header-custom">
+            <div class="icon-box">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div style="margin-left: 16px;">
+                <h5 class="main-title">Lịch Trình Giảng Dạy</h5>
+                <p class="sub-title">Quản lý chi tiết các ca hướng dẫn và kết quả đánh giá</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="schedule-table">
+                <thead>
+                <tr>
+                    <th>Sinh Viên</th>
+                    <th>Chủ đề</th>
+                    <th class="text-center">Thời gian</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${scheduleList}">
+                    <td><span class="student-name" th:text="${item.studentName}"></span></td>
+                    <td><span class="topic-text" th:text="${item.topic}"></span></td>
+                    <td class="text-center">
+                        <span class="time-text"
+                              th:text="${#temporals.format(item.startTime, 'HH:mm - dd/MM/yyyy')}"></span>
+                    </td>
+                    <td class="text-center">
+                        <span th:if="${item.status == 'ACCEPTED'}" class="badge-custom badge-upcoming">SẮP DIỄN RA</span>
+                        <span th:if="${item.status == 'COMPLETED'}" class="badge-custom badge-completed">HOÀN THÀNH</span>
+                    </td>
+                    <td class="text-center">
+
+                        <div th:if="${item.status == 'ACCEPTED'}" class="action-group">
+                            <button type="button" class="btn-eval"
+                                    th:data-id="${item.id}"
+                                    th:data-name="${item.studentName}"
+                                    th:data-topic="${item.topic}"
+                                    onclick="openEvalModal(this)">
+                                <i class="fa-solid fa-pen-to-square" style="margin-right:6px;"></i>Đánh giá
+                            </button>
+                        </div>
+
+                        <div th:if="${item.status == 'COMPLETED'}" class="action-group">
+                            <div class="score-box" style="margin: 0 auto;">
+                                <span class="score-value" th:text="${item.score}"></span> / 10
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(scheduleList)}">
+                    <td colspan="5" class="empty-state">
+                        <i class="fa-solid fa-folder-open" style="display:block; margin-bottom:8px; font-size:2rem; opacity:0.25;"></i>
+                        Hiện tại chưa có dữ liệu lịch trình. Hãy kiểm tra lại tab Danh sách chờ duyệt nhé!
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="evalModal" class="modal-overlay">
+        <div class="modal-content-custom">
+            <div class="modal-header-custom">
+                <h5>Đánh Giá Kết Quả</h5>
+                <button type="button" class="btn-close-modal" onclick="closeModal('evalModal')">&times;</button>
+            </div>
+            <form th:action="@{/lecturer/evaluate/save}" method="post">
+                <input type="hidden" id="modalSessionId" name="sessionId">
+                <div class="modal-body-custom">
+                    <div class="info-preview">
+                        <p class="label-small">Đang đánh giá ca dạy:</p>
+                        <p id="modalStudentName" class="student-modal-name"></p>
+                        <div class="topic-modal-row">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span id="modalTopic"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label-custom">Điểm số (0 – 10)</label>
+                            <input type="number" name="score" class="form-input"
+                                   step="0.1" min="0" max="10" required placeholder="Ví dụ: 9.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label-custom">Nhận xét nhanh</label>
+                            <input type="text" name="quickFeedback" class="form-input"
+                                   list="feedback-options" placeholder="Chọn hoặc nhập nhanh...">
+                            <datalist id="feedback-options">
+                                <option value="Xuất sắc">
+                                <option value="Tốt">
+                                <option value="Khá">
+                                <option value="Trung bình">
+                                <option value="Cần cải thiện">
+                            </datalist>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label-custom">Nội dung chi tiết</label>
+                            <textarea name="feedback" class="form-input" rows="2"
+                                      placeholder="Ghi chú thêm về thái độ, kiến thức của sinh viên..."></textarea>
+                        </div>
+
+                        <div class="form-group full" style="margin-top: 10px;">
+                            <div class="section-divider"><span>Chỉ định thiết bị cho mượn (Tùy chọn)</span></div>
+
+                            <div class="equipment-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px;">
+                                <div th:each="e : ${equipments}" class="eq-item">
+                                    <input type="checkbox" name="selectedEquipments" th:value="${e.id}" th:id="'eq-' + ${e.id}" style="display: none;">
+                                    <label th:for="'eq-' + ${e.id}" class="eq-card"
+                                           style="display: block; padding: 12px; text-align: center; background: #f4f7fe; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: 0.2s;">
+                                        <i class="fa-solid fa-microchip" style="font-size: 20px; color: #a3aed0; margin-bottom: 8px; display: block;"></i>
+                                        <span style="display: block; font-weight: 700; font-size: 13px; color: #2b3674; margin-bottom: 4px;" th:text="${e.name}">Arduino Uno</span>
+                                        <span style="font-size: 11px; color: #a3aed0; display: block;">Sẵn có: <b th:text="${e.availableQuantity}"></b></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div th:if="${#lists.isEmpty(equipments)}" style="text-align: center; padding: 15px; color: #a3aed0; font-style: italic; font-size: 13px;">
+                                Kho hiện tại không có thiết bị nào sẵn sàng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-cancel" onclick="closeModal('evalModal')">Đóng</button>
+                    <button type="submit" class="btn-submit-modal">
+                        <i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>Lưu kết quả
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
+
+        /* ===== MODAL ĐÁNH GIÁ ===== */
+        function openEvalModal(btn) {
+            document.getElementById('modalSessionId').value = btn.getAttribute('data-id');
+            document.getElementById('modalStudentName').innerText = btn.getAttribute('data-name');
+            document.getElementById('modalTopic').innerText = 'Chủ đề: ' + btn.getAttribute('data-topic');
+            openModal('evalModal');
+        }
+    </script>
+</div>
+
+</body>
+</html>

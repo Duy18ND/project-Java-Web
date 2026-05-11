@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+    <title>Đánh giá Hướng dẫn</title>
+</head>
+<body>
+
+<div class="container-fluid w-100 p-0" th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/evaluate.css}">
+
+    <div class="row w-100 m-0 justify-content-center">
+        <div class="col-12 col-xl-10 px-4 py-4">
+
+            <div class="d-flex align-items-center mb-4">
+                <a th:href="@{/lecturer/schedule}" class="btn-back me-3">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h4 class="mb-0 fw-bold title-purple">Đánh Giá Ca Hướng Dẫn</h4>
+                    <p class="text-muted mb-0">Hoàn tất nội dung và cấp phát thiết bị hỗ trợ</p>
+                </div>
+            </div>
+
+            <form th:action="@{/lecturer/evaluate/save}" method="post" id="evalForm">
+                <input type="hidden" name="sessionId" th:value="${session.id}">
+
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="card info-card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h6 class="section-label mb-3">Thông tin ca học</h6>
+                                <div class="info-item mb-3">
+                                    <label>Sinh viên hướng dẫn</label>
+                                    <p class="fw-bold mb-0" th:text="${session.studentName}">Nguyễn Văn A</p>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label>Chủ đề</label>
+                                    <p class="mb-0" th:text="${session.topic}">Tối ưu Hibernate</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Thời gian bắt đầu</label>
+                                    <p class="mb-0"><i class="fa-regular fa-clock me-1"></i>
+                                        <span th:text="${#temporals.format(session.startTime, 'HH:mm - dd/MM/yyyy')}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-body p-4">
+                                <h6 class="section-label mb-4">Kết quả đánh giá</h6>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Điểm số (0-10)</label>
+                                        <input type="number" name="score" class="form-input" step="0.1" min="0" max="10" placeholder="9.5" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold">Nhận xét nhanh</label>
+                                        <input type="text" class="form-input" placeholder="Sinh viên nắm vững kiến thức..." list="quick-feedback">
+                                        <datalist id="quick-feedback">
+                                            <option value="Nắm vững kiến thức, thực hành tốt.">
+                                            <option value="Cần cải thiện tư duy logic.">
+                                            <option value="Hoàn thành xuất sắc nội dung.">
+                                        </datalist>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Nội dung chi tiết & Ghi chú</label>
+                                    <textarea name="feedback" class="form-input" rows="4" placeholder="Nhập chi tiết quá trình hướng dẫn và các lưu ý cho sinh viên..."></textarea>
+                                </div>
+
+                                <h6 class="section-label mb-3">Thiết bị cấp phát (Tùy chọn)</h6>
+                                <div class="equipment-grid">
+                                    <div th:each="eq : ${equipments}" class="eq-item">
+                                        <input type="checkbox" name="selectedEquipments" th:value="${eq.id}" th:id="'eq-' + ${eq.id}">
+                                        <label th:for="'eq-' + ${eq.id}" class="eq-card">
+                                            <i class="fa-solid fa-microchip mb-2"></i>
+                                            <span class="d-block fw-bold text-xs" th:text="${eq.name}">Arduino Uno</span>
+                                            <span class="text-xxs text-muted">Sẵn có: [[${eq.availableQuantity}]]</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="text-end mt-5 border-top pt-4">
+                                    <button type="button" class="btn-cancel me-3" onclick="history.back()">Hủy bỏ</button>
+                                    <button type="submit" class="btn-submit">
+                                        <i class="fa-solid fa-check-double me-2"></i> Xác nhận hoàn thành
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

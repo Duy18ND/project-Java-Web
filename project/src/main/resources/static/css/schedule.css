@@ -1,0 +1,569 @@
+/* schedule.css - Full Width + Edit Modal */
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #4318ff;
+    --secondary-color: #5e17eb;
+    --bg-body: #f4f7fe;
+    --text-main: #2b3674;
+    --text-sub: #a3aed0;
+    --white: #ffffff;
+    --shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+}
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: var(--bg-body);
+}
+
+/* ===== WRAPPER ===== */
+.schedule-wrapper {
+    width: 100%;
+    min-height: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* ===== ALERT SUCCESS ===== */
+.alert-success-box {
+    border-radius: 12px;
+    background-color: #01b574;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(1, 181, 116, 0.2);
+    margin-bottom: 20px;
+    padding: 12px 16px;
+}
+
+/* ===== CARD ===== */
+.schedule-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-height: 70vh;
+}
+
+/* ===== CARD HEADER ===== */
+.card-header-custom {
+    display: flex;
+    align-items: center;
+    padding-bottom: 25px;
+}
+
+.main-title {
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin: 0 0 4px;
+}
+
+.sub-title {
+    color: var(--text-sub);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.icon-box {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
+}
+
+/* ===== TABLE WRAPPER ===== */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ===== TABLE ===== */
+.schedule-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.schedule-table thead th {
+    background-color: transparent;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 15px;
+    font-weight: 700;
+    border: none;
+    white-space: nowrap;
+}
+
+.schedule-table tbody tr {
+    background: var(--white);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-table tbody td {
+    padding: 20px 15px;
+    vertical-align: middle;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    border-top: 1px solid #f1f4f8;
+    border-bottom: 1px solid #f1f4f8;
+}
+
+.schedule-table tbody td:first-child {
+    border-left: 1px solid #f1f4f8;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    padding-left: 20px;
+}
+
+.schedule-table tbody td:last-child {
+    border-right: 1px solid #f1f4f8;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding-right: 20px;
+}
+
+/* ===== TEXT STYLES ===== */
+.student-name {
+    color: #1b2559;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.topic-text {
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.time-text {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* ===== BADGE TRẠNG THÁI ===== */
+.badge-custom {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 110px;
+    white-space: nowrap;
+}
+
+.badge-upcoming {
+    background: #e1f0ff;
+    color: #007bff;
+}
+
+.badge-completed {
+    background-color: #e6f7ed;
+    color: #01b574;
+}
+
+/* ===== ACTION GROUP (bọc các nút) ===== */
+.action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ===== NÚT ĐÁNH GIÁ ===== */
+.btn-eval {
+    background-color: #5e17eb;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.25s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.btn-eval:hover {
+    background-color: #4a11c0;
+    transform: scale(1.03);
+    box-shadow: 0 8px 15px rgba(94, 23, 235, 0.3);
+}
+
+/* ===== NÚT CHỈNH SỬA ===== */
+.btn-edit {
+    background-color: #f4f7fe;
+    color: var(--text-main) !important;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.25s ease;
+    border: 1.5px solid #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.btn-edit:hover {
+    background-color: #edf2f7;
+    border-color: #cbd5e0;
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== ĐIỂM SỐ ===== */
+.score-box {
+    color: var(--text-sub);
+    font-size: 14px;
+}
+
+.score-value {
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-sub);
+}
+
+/* ===========================
+   MODAL CHUNG
+   =========================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(27, 37, 89, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.active .modal-content-custom {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-content-custom {
+    background: white;
+    width: 100%;
+    max-width: 560px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0px 24px 48px rgba(27, 37, 89, 0.15);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    max-height: 92vh;
+    overflow-y: auto;
+}
+
+/* ===== MODAL HEADER ===== */
+.modal-header-custom {
+    padding: 22px 28px;
+    background: #fafbff;
+    border-bottom: 1px solid #f1f4f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.modal-header-custom h5 {
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Icon nhỏ trong header modal chỉnh sửa */
+.modal-icon-edit {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #f4f7fe, #edf2ff);
+    border: 1.5px solid #e8edff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 14px;
+}
+
+.btn-close-modal {
+    background: #f1f4f8;
+    border: none;
+    color: var(--text-sub);
+    font-size: 1.3rem;
+    line-height: 1;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: #e2e8f0;
+    color: #2b3674;
+}
+
+/* ===== MODAL BODY ===== */
+.modal-body-custom {
+    padding: 28px;
+}
+
+/* Info preview box */
+.info-preview {
+    background: linear-gradient(135deg, #f8faff 0%, #f1f4fe 100%);
+    border: 1px solid #e8edff;
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+}
+
+.info-preview .label-small {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--text-sub);
+    margin: 0 0 6px;
+}
+
+.info-preview .student-modal-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin: 0 0 8px;
+}
+
+.info-preview .topic-modal-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-sub);
+    font-size: 0.88rem;
+}
+
+/* Divider giữa phần thông tin & đánh giá */
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 16px;
+    color: var(--text-sub);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #f1f4f8;
+}
+
+/* Form grid */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+}
+
+.form-label-custom {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-input {
+    width: 100%;
+    padding: 11px 16px;
+    border: 2px solid #edf2f7;
+    border-radius: 12px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    font-size: 0.9rem;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--text-main);
+    background: #fafbff;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.08);
+    background: #fff;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 90px;
+}
+
+/* ===== MODAL FOOTER ===== */
+.modal-footer-custom {
+    padding: 18px 28px;
+    background: #fafbff;
+    border-top: 1px solid #f1f4f8;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    bottom: 0;
+}
+
+.btn-cancel {
+    background: none;
+    border: none;
+    color: var(--text-sub);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.btn-cancel:hover {
+    background: #f1f4f8;
+    color: var(--text-main);
+}
+
+.btn-submit-modal {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-submit-modal:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(94, 23, 235, 0.3);
+}
+
+/* Nút lưu chỉnh sửa dùng màu xanh lá để phân biệt */
+.btn-submit-edit {
+    background: linear-gradient(135deg, #0ea87a, #01b574);
+}
+
+.btn-submit-edit:hover {
+    box-shadow: 0 8px 20px rgba(1, 181, 116, 0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .schedule-wrapper {
+        padding: 12px;
+    }
+
+    .card-header-custom {
+        padding-bottom: 16px;
+    }
+
+    .schedule-table thead th,
+    .schedule-table tbody td {
+        padding: 12px 10px;
+    }
+
+    .action-group {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .modal-content-custom {
+        max-width: calc(100% - 24px);
+        margin: 12px;
+    }
+
+    .modal-body-custom {
+        padding: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
