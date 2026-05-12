@@ -77,6 +77,7 @@ public class AdminService {
         record.setStatus("REJECTED");
         borrowingRepository.save(record);
     }
+
     public List<BorrowingRecord> getAllBorrowingRecords() {
         // Lấy toàn bộ phiếu mượn để quản lý
         return borrowingRepository.findAll();

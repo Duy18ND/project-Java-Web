@@ -87,17 +87,30 @@
                 <div class="brc-footer" style="justify-content: flex-end; gap: 10px;">
 
                     <th:block th:if="${record.status == 'PENDING'}">
-                        <a th:href="@{/admin/borrow-requests/reject/{id}(id=${record.id})}"
-                           class="btn-secondary" style="color: #ef4444; border-color: #ef4444; text-decoration: none;"
-                           onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Bạn có chắc chắn muốn TỪ CHỐI phiếu mượn này không?', 'Xác nhận từ chối', () => window.location.href = url);">
-                            ✕ Từ chối
-                        </a>
-                        <a th:href="@{/admin/borrow-requests/approve/{id}(id=${record.id})}"
-                           class="btn-primary" style="text-decoration: none;"
-                           onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Xác nhận XUẤT KHO cho phiếu mượn này? Số lượng thiết bị sẽ bị trừ khỏi kho.', 'Xác nhận cấp phát', () => window.location.href = url);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Cho mượn
-                        </a>
+
+                        <th:block th:with="hasShortage=${record.borrowingDetails.?[equipment.availableQuantity < quantity].size() > 0}">
+
+                            <a th:href="@{/admin/borrow-requests/reject/{id}(id=${record.id})}"
+                               class="btn-secondary" style="color: #ef4444; border-color: #ef4444; text-decoration: none;"
+                               onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Bạn có chắc chắn muốn TỪ CHỐI phiếu mượn này không?', 'Xác nhận từ chối', () => window.location.href = url);">
+                                ✕ Từ chối
+                            </a>
+
+                            <a th:if="${!hasShortage}" th:href="@{/admin/borrow-requests/approve/{id}(id=${record.id})}"
+                               class="btn-primary" style="text-decoration: none;"
+                               onclick="event.preventDefault(); const url = this.getAttribute('href'); showConfirmDelete('Xác nhận XUẤT KHO cho phiếu mượn này? Số lượng thiết bị sẽ bị trừ khỏi kho.', 'Xác nhận cấp phát', () => window.location.href = url);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Cho mượn
+                            </a>
+
+                            <a th:if="${hasShortage}" href="javascript:void(0)"
+                               class="btn-primary" style="text-decoration: none; background-color: #94a3b8; border-color: #94a3b8; cursor: not-allowed;"
+                               onclick="if(typeof showErrorAlert === 'function') showErrorAlert('Không đủ thiết bị trong kho để xuất! Vui lòng chờ nhập thêm kho hoặc từ chối phiếu mượn này.'); else alert('Không đủ thiết bị trong kho để xuất!');">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Thiếu hàng
+                            </a>
+
+                        </th:block>
                     </th:block>
 
                     <th:block th:if="${record.status == 'BORROWING'}">

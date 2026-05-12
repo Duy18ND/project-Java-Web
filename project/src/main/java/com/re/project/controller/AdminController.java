@@ -38,7 +38,7 @@ public class AdminController {
         model.addAttribute("recentBorrows", adminService.getRecentBorrowingRecords(5));
 
         model.addAttribute("view", "admin/admin-dashboard");
-        return "home"; // Chuẩn file home.html
+        return "home";
     }
 
     @GetMapping("/equipment")

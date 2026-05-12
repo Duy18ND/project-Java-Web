@@ -169,8 +169,7 @@
 
                         <button type="button" th:if="${item.borrowingRecordId != null and item.borrowingStatus == 'BORROWING'}"
                                 class="btn-return"
-                                th:onclick="'handleReturn(' + ${item.borrowingRecordId} + ')'"
-                                style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 5px; width: 100%;">
+                                th:onclick="'handleReturn(' + ${item.borrowingRecordId} + ')'">
                             <i class="fa-solid fa-rotate-left"></i> Trả đồ
                         </button>
                     </td>
@@ -274,17 +273,27 @@
             document.getElementById('md-lecturer').innerHTML = `<i class="fa-solid fa-user-tie" style="color:#64748b; margin-right:6px;"></i> GV. ${lecturer}`;
             document.getElementById('md-datetime').innerHTML = `<i class="fa-regular fa-clock" style="color:#64748b; margin-right:6px;"></i> ${date} | ${time}`;
 
-            // 2. Render Danh sách Thiết bị
+            // 2. Render Danh sách Thiết bị (Xử lý bắt REJECTED tại đây)
             let statusText = '';
             let statusColor = '';
-            if (borrowStatus === 'BORROWING') { statusText = 'Đang mượn'; statusColor = '#f59e0b'; }
-            else if (borrowStatus === 'RETURNED') { statusText = 'Đã trả'; statusColor = '#10b981'; }
-            else if (borrowStatus === 'PENDING') { statusText = 'Admin đang chờ duyệt'; statusColor = '#64748b'; }
-            else { statusText = 'Đang xử lý'; statusColor = '#64748b'; }
+            let equipLabel = 'Danh sách thiết bị được cấp:'; // Nhãn mặc định
+
+            if (borrowStatus === 'BORROWING') {
+                statusText = 'Đang mượn'; statusColor = '#f59e0b';
+            } else if (borrowStatus === 'RETURNED') {
+                statusText = 'Đã trả'; statusColor = '#10b981';
+            } else if (borrowStatus === 'PENDING') {
+                statusText = 'Admin đang chờ duyệt'; statusColor = '#64748b';
+                equipLabel = 'Danh sách thiết bị yêu cầu mượn:';
+            } else if (borrowStatus === 'REJECTED') {
+                statusText = 'Admin đã từ chối'; statusColor = '#ef4444'; // Đỏ nổi bật
+                equipLabel = 'Danh sách thiết bị yêu cầu mượn:';
+            } else {
+                statusText = 'Đang xử lý'; statusColor = '#64748b';
+            }
 
             let equipListHtml = '<span style="color: #64748b; font-style: italic;">Chưa có dữ liệu</span>';
             if (equipments && equipments !== 'null' && equipments.trim() !== '') {
-                // Sửa lỗi split khoảng trắng bảo đảm cắt chuỗi chuẩn xác
                 const equipArray = equipments.split(',').map(e => e.trim());
                 equipListHtml = '<ul class="equip-list">';
                 equipArray.forEach(eq => {
@@ -301,7 +310,7 @@
                      <span style="background: ${statusColor}; color: white; font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 600;">${statusText}</span>
                    </div>
                    <div style="font-size: 14px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid ${statusColor}">
-                     <b style="color: #1e293b;">Danh sách thiết bị được cấp:</b>
+                     <b style="color: #1e293b;">${equipLabel}</b>
                      ${equipListHtml}
                    </div>`
                 : `<div style="color: #94a3b8; padding: 10px; background: #f8fafc; border-radius: 8px; text-align: center;"><i class="fa-solid fa-ban" style="margin-right: 5px;"></i> Lịch hẹn này không yêu cầu mượn thiết bị phòng Lab</div>`;
