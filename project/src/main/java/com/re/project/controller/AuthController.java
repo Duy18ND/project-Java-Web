@@ -23,13 +23,8 @@ public class AuthController {
     public String viewLogin(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // Chặn người dùng khi đã đăng nhập nhưng cố tình ấn quay lại trang
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-
-            // Lấy Role của người dùng hiện tại
             String role = auth.getAuthorities().iterator().next().getAuthority();
-
-            // Chuyển hướng (Redirect) về đúng đường dẫn theo Role
             if (role.equals("ROLE_ADMIN")) {
                 return "redirect:/admin/dashboard";
             } else if (role.equals("ROLE_LECTURER")) {
@@ -39,7 +34,6 @@ public class AuthController {
             }
         }
 
-        // Nếu chưa đăng nhập thì mới cho hiển thị form Login/Register
         model.addAttribute("registerRequest", new UserRegisterRequest());
         return "login-register";
     }
@@ -47,33 +41,45 @@ public class AuthController {
     @PostMapping("/register")
     public String registerSubmit(
             @Valid @ModelAttribute("registerRequest") UserRegisterRequest request,
-            BindingResult result
+            BindingResult result,
+            Model model // THÊM MODEL ĐỂ ĐẨY THÔNG BÁO LỖI RA GIAO DIỆN
     ) {
+        // 1. Có lỗi bỏ trống hoặc sai định dạng
         if (result.hasErrors()) {
+            model.addAttribute("hasRegisterErrors", true);
+            model.addAttribute("alertMessage", "Vui lòng kiểm tra lại các thông tin màu đỏ!");
             return "login-register";
         }
 
+        // 2. Lỗi mật khẩu không khớp
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             result.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp!");
+            model.addAttribute("hasRegisterErrors", true);
+            model.addAttribute("alertMessage", "Mật khẩu xác nhận không khớp!");
             return "login-register";
         }
 
+        // 3. Tiến hành lưu DB
         try {
             userService.registerNewUser(request);
             return "redirect:/login?success";
 
         } catch (RuntimeException e) {
+            model.addAttribute("hasRegisterErrors", true); // Bật cờ giữ lại Tab Đăng ký
             String errorMsg = e.getMessage();
 
             if ("USER_EXISTS".equals(errorMsg)) {
                 result.rejectValue("username", "error.username", "Tên đăng nhập đã tồn tại!");
+                model.addAttribute("alertMessage", "Tên đăng nhập đã tồn tại!");
             } else if ("EMAIL_EXISTS".equals(errorMsg)) {
                 result.rejectValue("email", "error.email", "Email đã tồn tại!");
+                model.addAttribute("alertMessage", "Email đã tồn tại!");
             } else if ("PHONE_EXISTS".equals(errorMsg)) {
                 result.rejectValue("phoneNumber", "error.phoneNumber", "Số điện thoại đã tồn tại!");
+                model.addAttribute("alertMessage", "Số điện thoại đã tồn tại!");
             } else {
                 e.printStackTrace();
-                System.out.println("====== LỖI LƯU DATABASE: " + errorMsg + " ======");
+                model.addAttribute("alertMessage", "Lỗi hệ thống: " + errorMsg);
             }
 
             return "login-register";

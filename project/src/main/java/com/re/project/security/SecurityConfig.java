@@ -26,7 +26,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // 2. TÀI NGUYÊN CÔNG KHAI (Ưu tiên số 1: Luôn nằm đầu tiên)
-                        .requestMatchers("/", "/login", "/register", "/css/**", "/script/**", "/images/**", "/uploads/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/script/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
 
                         // 3. PHÂN QUYỀN THEO ROLE (Ưu tiên số 2)

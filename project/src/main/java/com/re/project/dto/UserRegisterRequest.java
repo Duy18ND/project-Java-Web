@@ -1,40 +1,43 @@
 package com.re.project.dto;
 
+import com.re.project.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRegisterRequest {
-    @NotBlank(message = "Họ và tên không được để trống!")
+
+    @NotBlank(message = "Họ và tên không được để trống")
+    @Size(min = 2, max = 100, message = "Họ tên phải từ 2 đến 100 ký tự")
     private String fullName;
 
-    @NotBlank(message = "Email không được để trống!")
-    @Pattern(
-            regexp = "^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
-            message = "Email không đúng định dạng (VD: example@gmail.com)!"
-    )
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không đúng định dạng")
     private String email;
 
     @NotBlank(message = "Tên đăng nhập không được để trống")
-    @Size(min = 6, message = "Tên đăng nhập phải có ít nhất 6 ký tự")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Tên đăng nhập chỉ được chứa chữ cái không dấu và số")
+    @Size(min = 4, max = 50, message = "Tên đăng nhập phải từ 4 đến 50 ký tự")
     private String username;
 
-    @NotBlank(message = "Mật khẩu không được để trống!")
-    @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự!")
-    @Pattern(regexp = "^[\\x21-\\x7E]+$", message = "Mật khẩu không được chứa khoảng trắng và không có dấu tiếng Việt!")
+    @Pattern(regexp = "^(\\+84|0)[3|5|7|8|9][0-9]{8}$", message = "Số điện thoại không đúng định dạng")
+    private String phoneNumber;
+
+    // ĐÃ FIX: Thống nhất tên Enum là ROLE_STUDENT
+    private UserRole role = UserRole.STUDENT;
+
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
     private String password;
 
-    @NotBlank(message = "Vui lòng xác nhận lại mật khẩu!")
+    @NotBlank(message = "Xác nhận mật khẩu không được để trống")
     private String confirmPassword;
-
-    @NotBlank(message = "Số điện thoại không được để trống!")
-    @Pattern(regexp = "^(0|84|\\+84)[0-9]{9}$", message = "Số điện thoại phải bắt đầu bằng 0, 84 hoặc +84 và gồm đúng 10 số hợp lệ!")
-    private String phoneNumber;
 }
